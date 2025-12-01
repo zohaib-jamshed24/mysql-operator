@@ -6,12 +6,17 @@ image:
     enabled: false
     secretName:
 
-
-credentials:
-  root:
-    user: root
-#    password: sakila
-    host: "%"
+# Create a secret like below and pass the name.
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: mysql-root-secret
+# type: Opaque
+# stringData:
+#   rootUser: root
+#   rootHost: "%"
+#   rootPassword: rootPassword
+existingSecret: mysql-root-secret
 
 tls:
   useSelfSigned: false
