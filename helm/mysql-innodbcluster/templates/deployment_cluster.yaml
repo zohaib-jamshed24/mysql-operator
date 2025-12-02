@@ -450,6 +450,15 @@ spec:
     {{- end }}
     deleteBackupData: {{ $schedule.deleteBackupData }}
     enabled: {{ $schedule.enabled }}
+    {{- if ($schedule).ttlSecondsAfterFinished }}
+    ttlSecondsAfterFinished: {{ $schedule.ttlSecondsAfterFinished }}
+    {{- end }}
+    {{- if ($schedule).retentionDays }}
+    retentionDays: {{ $schedule.retentionDays }}
+    {{- end }}
+    {{- if ($schedule).retentionHours }}
+    retentionHours: {{ $schedule.retentionHours }}
+    {{- end }}
     {{- if hasKey $schedule "backupProfileName" }}
     backupProfileName: {{  $schedule.backupProfileName }}
     {{- else if hasKey $schedule "backupProfile" }}

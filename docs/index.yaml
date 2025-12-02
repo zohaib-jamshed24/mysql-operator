@@ -3,10 +3,10 @@ entries:
   mysql-innodbcluster:
   - apiVersion: v2
     appVersion: 9.5.0
-    created: "2025-12-02T13:28:56.6803851+01:00"
+    created: "2025-12-02T13:44:12.9455775+01:00"
     description: MySQL InnoDB Cluster Helm Chart for deploying MySQL InnoDB Cluster
       in Kubernetes
-    digest: c661cdf1c78e06dc4789807dcd9564f9d83af352fd8ef3a12bfd7779839ba2f1
+    digest: b78890911b2f9dc4807c99a7e781b8e1c6e6c3644da5ec2250fe03f3fe8a4978
     icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
     name: mysql-innodbcluster
     type: application
@@ -16,7 +16,7 @@ entries:
   mysql-operator:
   - apiVersion: v2
     appVersion: 9.5.0-2.2.6
-    created: "2025-12-02T13:28:56.6809124+01:00"
+    created: "2025-12-02T13:44:12.9455775+01:00"
     description: MySQL Operator Helm Chart for deploying MySQL InnoDB Cluster in Kubernetes
     digest: 83b0e4e70a26ccc84e8e62e6140706f9adf1f50315ea64a44256f59b4d372e84
     icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
@@ -25,4 +25,4 @@ entries:
     urls:
     - https://zohaib-jamshed24.github.io/mysql-operator/mysql-operator-2.2.6.tgz
     version: 2.2.6
-generated: "2025-12-02T13:28:56.6787212+01:00"
+generated: "2025-12-02T13:44:12.9455775+01:00"
