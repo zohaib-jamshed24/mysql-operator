@@ -1,0 +1,16 @@
+apiVersion: v1
+entries:
+  mysql-innodbcluster:
+  - apiVersion: v2
+    appVersion: 9.5.0
+    created: "2025-12-02T10:31:27.5268082+01:00"
+    description: MySQL InnoDB Cluster Helm Chart for deploying MySQL InnoDB Cluster
+      in Kubernetes
+    digest: c661cdf1c78e06dc4789807dcd9564f9d83af352fd8ef3a12bfd7779839ba2f1
+    icon: https://www.mysql.com/common/logos/logo-mysql-170x115.png
+    name: mysql-innodbcluster
+    type: application
+    urls:
+    - https://zohaib-jamshed24.github.io/mysql-operator/mysql-innodbcluster-2.2.6.tgz
+    version: 2.2.6
+generated: "2025-12-02T10:31:27.5261401+01:00"
