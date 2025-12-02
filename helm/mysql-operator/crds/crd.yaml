@@ -858,6 +858,15 @@ spec:
                       timeZone:
                         type: string
                         description: "Timezone for the backup schedule, example: 'America/New_York'"
+                      ttlSecondsAfterFinished:
+                        type: integer
+                        description: "Time to live in seconds for completed backup jobs. Jobs will be automatically deleted after this duration."
+                      retentionDays:
+                        type: integer
+                        description: "Number of days to retain backups in S3 storage. Backups older than this will be automatically deleted."
+                      retentionHours:
+                        type: integer
+                        description: "Number of hours to retain backups in S3 storage. Backups older than this will be automatically deleted."
                 logs:
                   type: object
                   properties:

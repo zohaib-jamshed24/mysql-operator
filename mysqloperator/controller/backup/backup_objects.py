@@ -251,6 +251,72 @@ def patch_cron_template_for_backup_schedule(base: dict, cluster_name: str, sched
     if schedule_profile.timeZone:
         new_object["spec"]["timeZone"] = schedule_profile.timeZone
 
+    # Add ttlSecondsAfterFinished if specified
+    if schedule_profile.ttlSecondsAfterFinished is not None:
+        new_object["spec"]["jobTemplate"]["spec"]["ttlSecondsAfterFinished"] = schedule_profile.ttlSecondsAfterFinished
+        
+    # Add cleanup container for S3 retention if specified
+    if (schedule_profile.retentionDays is not None and schedule_profile.retentionDays > 0) or \
+      (schedule_profile.retentionHours is not None and schedule_profile.retentionHours > 0):
+        storage_spec = schedule_profile.backupProfile.dumpInstance.storage if schedule_profile.backupProfile.dumpInstance else None
+        if storage_spec and storage_spec.s3:
+            s3 = storage_spec.s3
+            # Determine retention period
+            if schedule_profile.retentionHours is not None and schedule_profile.retentionHours > 0:
+              retention_calc = f"timedelta(hours={schedule_profile.retentionHours})"
+              retention_desc = f"{schedule_profile.retentionHours} hours"
+            else:
+              retention_calc = f"timedelta(days={schedule_profile.retentionDays})"
+              retention_desc = f"{schedule_profile.retentionDays} days"
+            cleanup_script = f"""
+
+import boto3
+from datetime import datetime, timedelta, timezone
+import os
+
+os.environ['AWS_SHARED_CREDENTIALS_FILE'] = '/mysqlsh/.aws/credentials'
+os.environ['AWS_CONFIG_FILE'] = '/mysqlsh/.aws/config'
+
+bucket = '{s3.bucketName}'
+prefix = '{s3.prefix}'
+profile = '{s3.profile}'
+endpoint = '{s3.endpoint}' if '{s3.endpoint}' else None
+cutoff = datetime.now(timezone.utc) - {retention_calc}
+
+session = boto3.Session(profile_name=profile)
+s3_client = session.client('s3', endpoint_url=endpoint)
+
+print(f'Cleaning backups older than {{cutoff}} ({retention_desc}) from s3://{{bucket}}/{{prefix}}')
+
+deleted = 0
+paginator = s3_client.get_paginator('list_objects_v2')
+for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+    for obj in page.get('Contents', []):
+        if obj['LastModified'] < cutoff:
+            print(f"Deleting {{obj['Key']}} ({{obj['LastModified']}})")
+            s3_client.delete_object(Bucket=bucket, Key=obj['Key'])
+            deleted += 1
+print(f'Deleted {{deleted}} old backup(s)')
+"""
+            cleanup_container = {
+                "name": "cleanup-old-backups",
+                "image": new_object["spec"]["jobTemplate"]["spec"]["template"]["spec"]["containers"][0]["image"],
+                "command": ["python3", "-c", cleanup_script],
+                "securityContext": {
+                    "allowPrivilegeEscalation": False,
+                    "privileged": False,
+                    "readOnlyRootFilesystem": True,
+                    "runAsNonRoot": True,
+                    "runAsUser": 27,
+                    "capabilities": {"drop": ["ALL"]}
+                },
+                "volumeMounts": [
+                    {"name": "s3-config-volume", "readOnly": True, "mountPath": "/mysqlsh/.aws"}
+                    ]
+            }
+
+            new_object["spec"]["jobTemplate"]["spec"]["template"]["spec"]["containers"].append(cleanup_container)
+
     metadata = {}
     if schedule_profile.backupProfile.podAnnotations:
         metadata['annotations'] = schedule_profile.backupProfile.podAnnotations

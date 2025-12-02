@@ -170,6 +170,9 @@ class BackupSchedule:
         self.enabled: bool = False
         self.timeZone: str = ""
         self.deleteBackupData: bool = False # unused
+        self.ttlSecondsAfterFinished: Optional[int] = None
+        self.retentionDays: Optional[int] = None
+        self.retentionHours: Optional[int] = None
 
     def add_to_pod_spec(self, pod_spec: dict, container_name: str) -> None:
         assert self.backupProfile
@@ -186,6 +189,12 @@ class BackupSchedule:
         self.backupProfileName = dget_str(spec, "backupProfileName", prefix, default_value= "")
 
         self.timeZone = dget_str(spec, "timeZone", prefix, default_value="") # marking timeZone with default_value None will make it non-optional
+
+        self.ttlSecondsAfterFinished = dget_int(spec, "ttlSecondsAfterFinished", prefix, default_value=None)
+
+        self.retentionDays = dget_int(spec, "retentionDays", prefix, default_value=None)
+
+        self.retentionHours = dget_int(spec, "retentionHours", prefix, default_value=None)
 
         self.schedule = dget_str(spec, "schedule", prefix)
         if not self.schedule:
